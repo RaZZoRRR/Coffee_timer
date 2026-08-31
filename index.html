@@ -2,531 +2,713 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Timer</title>
+    <title>Секундомер</title>
 
-<style>
-    * {
-        box-sizing: border-box;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    html, body {
-        margin: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        font-family: Arial, sans-serif;
-    }
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
 
-    body {
-        background-color: #111;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+        body {
+            font-family: Arial, Helvetica, sans-serif;
 
-        display: flex;
-        justify-content: center;
-        align-items: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-        transition: background-image 0.5s ease,
-                    background-color 0.5s ease;
-    }
+            background-color: #171717;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
 
-    /* Затемнение фона */
-    .overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.35);
-        pointer-events: none;
-    }
+            color: white;
 
-    .timer-container {
-        position: relative;
-        z-index: 2;
+            overflow: hidden;
 
-        text-align: center;
-        color: white;
+            transition: background-color 0.3s ease,
+                        background-image 0.3s ease;
+        }
 
-        user-select: none;
-    }
+        /* Затемнение фона */
+        .overlay {
+            position: fixed;
+            inset: 0;
 
-    .timer {
-        font-size: clamp(80px, 15vw, 220px);
-        font-weight: 700;
-        letter-spacing: 5px;
+            background: rgba(0, 0, 0, 0.25);
 
-        text-shadow:
-            0 4px 20px rgba(0,0,0,0.7);
-    }
+            pointer-events: none;
+        }
 
-    .controls {
-        margin-top: 30px;
+        /* Основной контейнер */
+        .container {
+            position: relative;
+            z-index: 2;
 
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
+            text-align: center;
 
-    button {
-        border: none;
-        border-radius: 12px;
+            padding: 30px;
+        }
 
-        padding: 12px 22px;
+        /* Секундомер */
+        .stopwatch {
+            font-size: clamp(70px, 14vw, 190px);
 
-        font-size: 18px;
-        font-weight: 600;
+            font-weight: 700;
 
-        cursor: pointer;
+            letter-spacing: 5px;
 
-        background: rgba(255,255,255,0.9);
-        color: #111;
+            line-height: 1;
 
-        transition: transform 0.15s,
-                    background 0.15s;
-    }
+            text-shadow:
+                0 4px 25px rgba(0, 0, 0, 0.7);
 
-    button:hover {
-        transform: translateY(-2px);
-        background: white;
-    }
+            font-variant-numeric: tabular-nums;
+        }
 
-    button:active {
-        transform: translateY(0);
-    }
+        /* Кнопки */
+        .controls {
+            display: flex;
 
-    /* Панель настроек */
-    .settings {
-        position: fixed;
-        top: 20px;
-        right: 20px;
+            justify-content: center;
 
-        z-index: 10;
+            gap: 12px;
 
-        display: flex;
-        gap: 8px;
-    }
+            margin-top: 40px;
 
-    .settings button {
-        width: 48px;
-        height: 48px;
+            flex-wrap: wrap;
+        }
 
-        padding: 0;
+        button {
+            border: none;
 
-        font-size: 22px;
+            padding: 14px 28px;
 
-        border-radius: 50%;
-    }
+            border-radius: 12px;
 
-    .background-panel {
-        position: fixed;
+            background: rgba(255, 255, 255, 0.92);
 
-        top: 80px;
-        right: 20px;
+            color: #111;
 
-        z-index: 10;
+            font-size: 18px;
 
-        width: 280px;
+            font-weight: 600;
 
-        padding: 20px;
+            cursor: pointer;
 
-        border-radius: 16px;
+            transition:
+                transform 0.15s ease,
+                background 0.15s ease;
+        }
 
-        background: rgba(20,20,20,0.9);
-        color: white;
+        button:hover {
+            background: white;
 
-        box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transform: translateY(-2px);
+        }
 
-        display: none;
-    }
+        button:active {
+            transform: translateY(0);
+        }
 
-    .background-panel.visible {
-        display: block;
-    }
+        /* Кнопка настроек */
+        .settings-button {
+            position: fixed;
 
-    .background-panel h3 {
-        margin-top: 0;
-    }
+            top: 20px;
+            right: 20px;
 
-    .background-panel input[type="color"] {
-        width: 100%;
-        height: 45px;
+            z-index: 10;
 
-        border: none;
-        padding: 0;
+            width: 48px;
+            height: 48px;
 
-        cursor: pointer;
-    }
+            padding: 0;
 
-    .background-panel input[type="text"] {
-        width: 100%;
+            border-radius: 50%;
 
-        padding: 10px;
+            font-size: 22px;
+        }
 
-        border-radius: 8px;
-        border: 1px solid #555;
+        /* Панель настроек */
+        .settings-panel {
+            position: fixed;
 
-        background: #222;
-        color: white;
+            top: 80px;
+            right: 20px;
 
-        margin-top: 10px;
-    }
+            z-index: 10;
 
-    .background-panel label {
-        display: block;
-        margin-top: 15px;
-        margin-bottom: 5px;
-    }
+            width: 300px;
 
-    .background-panel .small {
-        font-size: 13px;
-        color: #aaa;
-        line-height: 1.4;
-    }
-</style>
+            padding: 20px;
+
+            border-radius: 16px;
+
+            background: rgba(20, 20, 20, 0.94);
+
+            color: white;
+
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.5);
+
+            display: none;
+        }
+
+        .settings-panel.open {
+            display: block;
+        }
+
+        .settings-panel h2 {
+            margin-top: 0;
+
+            margin-bottom: 20px;
+
+            font-size: 20px;
+        }
+
+        .settings-panel label {
+            display: block;
+
+            margin-top: 15px;
+
+            margin-bottom: 7px;
+
+            font-size: 14px;
+        }
+
+        .settings-panel input[type="color"] {
+            width: 100%;
+
+            height: 45px;
+
+            padding: 0;
+
+            border: none;
+
+            cursor: pointer;
+        }
+
+        .settings-panel input[type="text"] {
+            width: 100%;
+
+            padding: 11px;
+
+            border: 1px solid #555;
+
+            border-radius: 8px;
+
+            background: #292929;
+
+            color: white;
+
+            outline: none;
+
+            font-size: 14px;
+        }
+
+        .settings-panel input[type="text"]:focus {
+            border-color: #aaa;
+        }
+
+        .settings-panel .reset-background {
+            width: 100%;
+
+            margin-top: 20px;
+
+            font-size: 15px;
+        }
+
+        .hint {
+            margin-top: 12px;
+
+            color: #aaa;
+
+            font-size: 12px;
+
+            line-height: 1.4;
+        }
+
+        /* Мобильные устройства */
+        @media (max-width: 600px) {
+
+            .stopwatch {
+                font-size: 18vw;
+
+                letter-spacing: 2px;
+            }
+
+            .controls {
+                margin-top: 30px;
+            }
+
+            button {
+                padding: 12px 20px;
+
+                font-size: 16px;
+            }
+
+            .settings-panel {
+                right: 10px;
+                left: 10px;
+
+                width: auto;
+            }
+        }
+    </style>
 </head>
+
 
 <body>
 
-<div class="overlay"></div>
+    <div class="overlay"></div>
 
-<div class="settings">
-    <button onclick="toggleBackgroundPanel()">⚙</button>
-</div>
 
-<div class="background-panel" id="backgroundPanel">
+    <!-- Настройки -->
 
-    <h3>Фон</h3>
-
-    <label>Цвет</label>
-
-    <input
-        type="color"
-        id="backgroundColor"
-        value="#111111"
-        onchange="changeBackgroundColor()"
+    <button
+        class="settings-button"
+        onclick="toggleSettings()"
+        aria-label="Настройки"
     >
-
-    <label>URL изображения</label>
-
-    <input
-        type="text"
-        id="backgroundUrl"
-        placeholder="https://..."
-        onchange="changeBackgroundImage()"
-    >
-
-    <p class="small">
-        Можно указать прямую ссылку на изображение.
-        Настройка сохраняется в браузере.
-    </p>
-
-    <button onclick="resetBackground()">
-        Сбросить
+        ⚙
     </button>
 
-</div>
+
+    <div
+        class="settings-panel"
+        id="settingsPanel"
+    >
+
+        <h2>Настройки фона</h2>
 
 
-<div class="timer-container">
+        <label for="backgroundColor">
+            Цвет фона
+        </label>
 
-    <div class="timer" id="timer">
-        25:00
+        <input
+            type="color"
+            id="backgroundColor"
+            value="#171717"
+        >
+
+
+        <label for="backgroundUrl">
+            URL изображения
+        </label>
+
+        <input
+            type="text"
+            id="backgroundUrl"
+            placeholder="https://example.com/image.jpg"
+        >
+
+
+        <button
+            class="reset-background"
+            onclick="resetBackground()"
+        >
+            Сбросить фон
+        </button>
+
+
+        <div class="hint">
+            Настройки фона сохраняются в браузере
+            и останутся после перезагрузки страницы.
+        </div>
+
     </div>
 
-    <div class="controls">
 
-        <button onclick="startTimer()">
-            ▶ Старт
-        </button>
+    <!-- Секундомер -->
 
-        <button onclick="pauseTimer()">
-            ⏸ Пауза
-        </button>
+    <main class="container">
 
-        <button onclick="resetTimer()">
-            ↻ Сброс
-        </button>
-
-    </div>
-
-</div>
+        <div
+            class="stopwatch"
+            id="stopwatch"
+        >
+            00:00:00
+        </div>
 
 
-<script>
+        <div class="controls">
 
-    /*
-     * ============================
-     * НАСТРОЙКИ ТАЙМЕРА
-     * ============================
-     */
+            <button onclick="startStopwatch()">
+                ▶ Старт
+            </button>
 
-    const DEFAULT_MINUTES = 25;
+            <button onclick="pauseStopwatch()">
+                ⏸ Пауза
+            </button>
 
-    let remainingSeconds = DEFAULT_MINUTES * 60;
-    let timerInterval = null;
+            <button onclick="resetStopwatch()">
+                ↻ Сброс
+            </button>
 
+        </div>
 
-    /*
-     * ============================
-     * ОТОБРАЖЕНИЕ ВРЕМЕНИ
-     * ============================
-     */
-
-    function updateDisplay() {
-
-        const minutes = Math.floor(remainingSeconds / 60);
-
-        const seconds = remainingSeconds % 60;
-
-        document.getElementById("timer").textContent =
-            String(minutes).padStart(2, "0") +
-            ":" +
-            String(seconds).padStart(2, "0");
-    }
+    </main>
 
 
-    /*
-     * ============================
-     * СТАРТ
-     * ============================
-     */
+    <script>
 
-    function startTimer() {
+        /*
+         * ==========================================
+         * СЕКУНДОМЕР
+         * ==========================================
+         */
 
-        if (timerInterval !== null) {
-            return;
+        let startTime = null;
+
+        let elapsedTime = 0;
+
+        let animationFrame = null;
+
+        let running = false;
+
+
+        /*
+         * Форматирование времени
+         *
+         * 00:00:00
+         */
+
+        function formatTime(milliseconds) {
+
+            const totalSeconds =
+                Math.floor(milliseconds / 1000);
+
+
+            const hours =
+                Math.floor(totalSeconds / 3600);
+
+
+            const minutes =
+                Math.floor(
+                    (totalSeconds % 3600) / 60
+                );
+
+
+            const seconds =
+                totalSeconds % 60;
+
+
+            return (
+                String(hours).padStart(2, "0") +
+                ":" +
+                String(minutes).padStart(2, "0") +
+                ":" +
+                String(seconds).padStart(2, "0")
+            );
         }
 
-        timerInterval = setInterval(() => {
 
-            if (remainingSeconds > 0) {
+        /*
+         * Обновление экрана
+         */
 
-                remainingSeconds--;
+        function updateStopwatch() {
 
-                updateDisplay();
-
-            } else {
-
-                pauseTimer();
-
-                // Звук окончания
-                playSound();
-
+            if (!running) {
+                return;
             }
 
-        }, 1000);
-    }
+
+            const now = performance.now();
 
 
-    /*
-     * ============================
-     * ПАУЗА
-     * ============================
-     */
-
-    function pauseTimer() {
-
-        clearInterval(timerInterval);
-
-        timerInterval = null;
-    }
+            elapsedTime =
+                now - startTime;
 
 
-    /*
-     * ============================
-     * СБРОС
-     * ============================
-     */
-
-    function resetTimer() {
-
-        pauseTimer();
-
-        remainingSeconds = DEFAULT_MINUTES * 60;
-
-        updateDisplay();
-    }
+            document.getElementById(
+                "stopwatch"
+            ).textContent =
+                formatTime(elapsedTime);
 
 
-    /*
-     * ============================
-     * ЗВУК
-     * ============================
-     */
-
-    function playSound() {
-
-        const audioContext =
-            new (window.AudioContext ||
-                 window.webkitAudioContext)();
-
-        const oscillator =
-            audioContext.createOscillator();
-
-        const gain =
-            audioContext.createGain();
-
-        oscillator.frequency.value = 800;
-
-        oscillator.connect(gain);
-
-        gain.connect(audioContext.destination);
-
-        oscillator.start();
-
-        gain.gain.setValueAtTime(
-            0.3,
-            audioContext.currentTime
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.001,
-            audioContext.currentTime + 1
-        );
-
-        oscillator.stop(
-            audioContext.currentTime + 1
-        );
-    }
-
-
-    /*
-     * ============================
-     * ПАНЕЛЬ ФОНА
-     * ============================
-     */
-
-    function toggleBackgroundPanel() {
-
-        const panel =
-            document.getElementById("backgroundPanel");
-
-        panel.classList.toggle("visible");
-    }
-
-
-    /*
-     * ============================
-     * ЦВЕТ ФОНА
-     * ============================
-     */
-
-    function changeBackgroundColor() {
-
-        const color =
-            document.getElementById("backgroundColor").value;
-
-        document.body.style.backgroundColor = color;
-
-        localStorage.setItem(
-            "backgroundColor",
-            color
-        );
-    }
-
-
-    /*
-     * ============================
-     * ИЗОБРАЖЕНИЕ ФОНА
-     * ============================
-     */
-
-    function changeBackgroundImage() {
-
-        const url =
-            document.getElementById("backgroundUrl").value.trim();
-
-        if (!url) {
-            return;
-        }
-
-        document.body.style.backgroundImage =
-            `url("${url}")`;
-
-        localStorage.setItem(
-            "backgroundImage",
-            url
-        );
-    }
-
-
-    /*
-     * ============================
-     * СБРОС ФОНА
-     * ============================
-     */
-
-    function resetBackground() {
-
-        document.body.style.backgroundImage = "none";
-
-        document.body.style.backgroundColor = "#111111";
-
-        document.getElementById("backgroundColor").value =
-            "#111111";
-
-        document.getElementById("backgroundUrl").value =
-            "";
-
-        localStorage.removeItem("backgroundImage");
-
-        localStorage.setItem(
-            "backgroundColor",
-            "#111111"
-        );
-    }
-
-
-    /*
-     * ============================
-     * ЗАГРУЗКА СОХРАНЁННЫХ НАСТРОЕК
-     * ============================
-     */
-
-    function loadBackground() {
-
-        const savedColor =
-            localStorage.getItem("backgroundColor");
-
-        const savedImage =
-            localStorage.getItem("backgroundImage");
-
-
-        if (savedColor) {
-
-            document.body.style.backgroundColor =
-                savedColor;
-
-            document.getElementById("backgroundColor").value =
-                savedColor;
+            animationFrame =
+                requestAnimationFrame(
+                    updateStopwatch
+                );
         }
 
 
-        if (savedImage) {
+        /*
+         * Старт
+         */
 
-            document.body.style.backgroundImage =
-                `url("${savedImage}")`;
+        function startStopwatch() {
 
-            document.getElementById("backgroundUrl").value =
-                savedImage;
+            if (running) {
+                return;
+            }
+
+
+            running = true;
+
+
+            /*
+             * Восстанавливаем правильное
+             * время после паузы.
+             */
+
+            startTime =
+                performance.now() - elapsedTime;
+
+
+            animationFrame =
+                requestAnimationFrame(
+                    updateStopwatch
+                );
         }
-    }
 
 
-    /*
-     * ============================
-     * ИНИЦИАЛИЗАЦИЯ
-     * ============================
-     */
+        /*
+         * Пауза
+         */
 
-    updateDisplay();
+        function pauseStopwatch() {
 
-    loadBackground();
+            if (!running) {
+                return;
+            }
 
-</script>
+
+            running = false;
+
+
+            /*
+             * Фиксируем последнее значение.
+             */
+
+            elapsedTime =
+                performance.now() - startTime;
+
+
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+
+            document.getElementById(
+                "stopwatch"
+            ).textContent =
+                formatTime(elapsedTime);
+        }
+
+
+        /*
+         * Сброс
+         */
+
+        function resetStopwatch() {
+
+            running = false;
+
+
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+
+            startTime = null;
+
+            elapsedTime = 0;
+
+
+            document.getElementById(
+                "stopwatch"
+            ).textContent =
+                "00:00:00";
+        }
+
+
+        /*
+         * ==========================================
+         * НАСТРОЙКИ ФОНА
+         * ==========================================
+         */
+
+        function toggleSettings() {
+
+            const panel =
+                document.getElementById(
+                    "settingsPanel"
+                );
+
+
+            panel.classList.toggle("open");
+        }
+
+
+        /*
+         * Цвет фона
+         */
+
+        document
+            .getElementById("backgroundColor")
+            .addEventListener(
+                "input",
+                function () {
+
+                    const color = this.value;
+
+
+                    document.body.style
+                        .backgroundColor =
+                        color;
+
+
+                    localStorage.setItem(
+                        "backgroundColor",
+                        color
+                    );
+                }
+            );
+
+
+        /*
+         * Изображение фона
+         */
+
+        document
+            .getElementById("backgroundUrl")
+            .addEventListener(
+                "change",
+                function () {
+
+                    const url =
+                        this.value.trim();
+
+
+                    if (!url) {
+                        return;
+                    }
+
+
+                    document.body.style
+                        .backgroundImage =
+                        `url("${url}")`;
+
+
+                    localStorage.setItem(
+                        "backgroundImage",
+                        url
+                    );
+                }
+            );
+
+
+        /*
+         * Сброс фона
+         */
+
+        function resetBackground() {
+
+            document.body.style
+                .backgroundImage =
+                "none";
+
+
+            document.body.style
+                .backgroundColor =
+                "#171717";
+
+
+            document
+                .getElementById("backgroundColor")
+                .value =
+                "#171717";
+
+
+            document
+                .getElementById("backgroundUrl")
+                .value =
+                "";
+
+
+            localStorage.removeItem(
+                "backgroundImage"
+            );
+
+
+            localStorage.setItem(
+                "backgroundColor",
+                "#171717"
+            );
+        }
+
+
+        /*
+         * Загрузка сохранённого фона
+         */
+
+        function loadBackground() {
+
+            const savedColor =
+                localStorage.getItem(
+                    "backgroundColor"
+                );
+
+
+            const savedImage =
+                localStorage.getItem(
+                    "backgroundImage"
+                );
+
+
+            if (savedColor) {
+
+                document.body.style
+                    .backgroundColor =
+                    savedColor;
+
+
+                document
+                    .getElementById(
+                        "backgroundColor"
+                    )
+                    .value =
+                    savedColor;
+            }
+
+
+            if (savedImage) {
+
+                document.body.style
+                    .backgroundImage =
+                    `url("${savedImage}")`;
+
+
+                document
+                    .getElementById(
+                        "backgroundUrl"
+                    )
+                    .value =
+                    savedImage;
+            }
+        }
+
+
+        /*
+         * Инициализация
+         */
+
+        loadBackground();
+
+    </script>
 
 </body>
 </html>
