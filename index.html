@@ -97,8 +97,19 @@
 
 
         /* ==========================================
-           СЕКУНДОМЕР
+           СЕКУНДОМЕР + СТРЕЛКА
            ========================================== */
+
+        .timer-row {
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 45px;
+        }
+
 
         .stopwatch {
             font-size: 180px !important;
@@ -115,6 +126,53 @@
 
             text-shadow:
                 0 5px 30px rgba(0, 0, 0, 0.8);
+        }
+
+
+        /* ==========================================
+           МИГАЮЩАЯ СТРЕЛКА
+           ========================================== */
+
+        .arrow {
+            font-size: 150px;
+
+            font-weight: 700;
+
+            line-height: 1;
+
+            text-shadow:
+                0 5px 30px rgba(0, 0, 0, 0.8);
+
+            /*
+             * 1 секунда на полный цикл:
+             * 0.5 сек — видима
+             * 0.5 сек — скрыта
+             *
+             * steps(1, end) делает переключение
+             * резким, без плавного затухания.
+             */
+
+            animation:
+                arrowBlink 1s steps(1, end) infinite;
+
+            user-select: none;
+        }
+
+
+        @keyframes arrowBlink {
+
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+
         }
 
 
@@ -322,7 +380,7 @@
 
 
         /* ==========================================
-           ИЗМЕНЕНИЕ НАЗВАНИЯ
+           НАЗВАНИЕ
            ========================================== */
 
         .title-input {
@@ -414,6 +472,41 @@
         }
 
 
+        /* ==========================================
+           ПЕРЕКЛЮЧАТЕЛЬ СТРЕЛКИ
+           ========================================== */
+
+        .arrow-setting {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-top: 25px;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+
+        .arrow-setting span {
+            font-size: 18px;
+        }
+
+
+        .arrow-checkbox {
+            width: 25px;
+
+            height: 25px;
+
+            cursor: pointer;
+        }
+
+
         .hint {
             margin-top: 15px;
 
@@ -447,10 +540,20 @@
             }
 
 
+            .timer-row {
+                gap: 15px;
+            }
+
+
             .stopwatch {
                 font-size: 80px !important;
 
                 letter-spacing: 2px;
+            }
+
+
+            .arrow {
+                font-size: 65px;
             }
 
 
@@ -589,6 +692,27 @@
 
 
         <!-- ======================================
+             СТРЕЛКА
+             ====================================== -->
+
+        <div class="arrow-setting">
+
+            <span>
+                Показывать стрелку →
+            </span>
+
+            <input
+                type="checkbox"
+                class="arrow-checkbox"
+                id="arrowCheckbox"
+                checked
+                onchange="toggleArrow()"
+            >
+
+        </div>
+
+
+        <!-- ======================================
              ЦВЕТ ФОНА
              ====================================== -->
 
@@ -656,13 +780,27 @@
         </div>
 
 
-        <!-- Секундомер -->
+        <!-- Таймер и стрелка -->
 
-        <div
-            class="stopwatch"
-            id="stopwatch"
-        >
-            00:00:00
+        <div class="timer-row">
+
+
+            <div
+                class="stopwatch"
+                id="stopwatch"
+            >
+                00:00:00
+            </div>
+
+
+            <div
+                class="arrow"
+                id="arrow"
+            >
+                →
+            </div>
+
+
         </div>
 
 
@@ -1017,19 +1155,10 @@
                 input.value.trim();
 
 
-            /*
-             * Если поле пустое,
-             * оставляем текущее название.
-             */
-
             if (!title) {
                 return;
             }
 
-
-            /*
-             * Меняем название на экране
-             */
 
             document.getElementById(
                 "title"
@@ -1037,17 +1166,9 @@
                 title;
 
 
-            /*
-             * Меняем title страницы
-             */
-
             document.title =
                 title;
 
-
-            /*
-             * Сохраняем название
-             */
 
             localStorage.setItem(
                 "pageTitle",
@@ -1057,7 +1178,51 @@
 
 
         /* ==========================================
-           НАСТРОЙКИ ФОНА
+           СТРЕЛКА
+           ========================================== */
+
+
+        function toggleArrow() {
+
+            const checkbox =
+                document.getElementById(
+                    "arrowCheckbox"
+                );
+
+
+            const arrow =
+                document.getElementById(
+                    "arrow"
+                );
+
+
+            if (checkbox.checked) {
+
+                arrow.style.display =
+                    "block";
+
+
+                localStorage.setItem(
+                    "showArrow",
+                    "true"
+                );
+
+            } else {
+
+                arrow.style.display =
+                    "none";
+
+
+                localStorage.setItem(
+                    "showArrow",
+                    "false"
+                );
+            }
+        }
+
+
+        /* ==========================================
+           НАСТРОЙКИ
            ========================================== */
 
 
@@ -1073,9 +1238,10 @@
         }
 
 
-        /*
-         * Изменение цвета фона
-         */
+        /* ==========================================
+           ЦВЕТ ФОНА
+           ========================================== */
+
 
         document
             .getElementById("backgroundColor")
@@ -1091,11 +1257,6 @@
                         .backgroundColor =
                         color;
 
-
-                    /*
-                     * Если установлен
-                     * цвет — убираем картинку.
-                     */
 
                     document.body.style
                         .backgroundImage =
@@ -1115,9 +1276,10 @@
             );
 
 
-        /*
-         * Изменение изображения фона
-         */
+        /* ==========================================
+           ИЗОБРАЖЕНИЕ ФОНА
+           ========================================== */
+
 
         document
             .getElementById("backgroundUrl")
@@ -1147,9 +1309,10 @@
             );
 
 
-        /*
-         * Сброс фона
-         */
+        /* ==========================================
+           СБРОС ФОНА
+           ========================================== */
+
 
         function resetBackground() {
 
@@ -1199,7 +1362,7 @@
         function loadSettings() {
 
             /*
-             * Загружаем название
+             * Название
              */
 
             const savedTitle =
@@ -1228,7 +1391,45 @@
 
 
             /*
-             * Загружаем цвет
+             * Состояние стрелки
+             */
+
+            const savedArrow =
+                localStorage.getItem(
+                    "showArrow"
+                );
+
+
+            if (savedArrow === "false") {
+
+                document.getElementById(
+                    "arrow"
+                ).style.display =
+                    "none";
+
+
+                document.getElementById(
+                    "arrowCheckbox"
+                ).checked =
+                    false;
+
+            } else {
+
+                document.getElementById(
+                    "arrow"
+                ).style.display =
+                    "block";
+
+
+                document.getElementById(
+                    "arrowCheckbox"
+                ).checked =
+                    true;
+            }
+
+
+            /*
+             * Цвет
              */
 
             const savedColor =
@@ -1238,7 +1439,7 @@
 
 
             /*
-             * Загружаем изображение
+             * Изображение
              */
 
             const savedImage =
@@ -1281,7 +1482,7 @@
 
 
         /*
-         * Инициализация
+         * Запуск настроек
          */
 
         loadSettings();
@@ -1291,4 +1492,3 @@
 
 </body>
 </html>
-
