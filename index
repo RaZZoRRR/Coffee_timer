@@ -1,0 +1,533 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Timer</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #111;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        transition: background-image 0.5s ease,
+                    background-color 0.5s ease;
+    }
+
+    /* Затемнение фона */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        pointer-events: none;
+    }
+
+    .timer-container {
+        position: relative;
+        z-index: 2;
+
+        text-align: center;
+        color: white;
+
+        user-select: none;
+    }
+
+    .timer {
+        font-size: clamp(80px, 15vw, 220px);
+        font-weight: 700;
+        letter-spacing: 5px;
+
+        text-shadow:
+            0 4px 20px rgba(0,0,0,0.7);
+    }
+
+    .controls {
+        margin-top: 30px;
+
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    button {
+        border: none;
+        border-radius: 12px;
+
+        padding: 12px 22px;
+
+        font-size: 18px;
+        font-weight: 600;
+
+        cursor: pointer;
+
+        background: rgba(255,255,255,0.9);
+        color: #111;
+
+        transition: transform 0.15s,
+                    background 0.15s;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        background: white;
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+
+    /* Панель настроек */
+    .settings {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+
+        z-index: 10;
+
+        display: flex;
+        gap: 8px;
+    }
+
+    .settings button {
+        width: 48px;
+        height: 48px;
+
+        padding: 0;
+
+        font-size: 22px;
+
+        border-radius: 50%;
+    }
+
+    .background-panel {
+        position: fixed;
+
+        top: 80px;
+        right: 20px;
+
+        z-index: 10;
+
+        width: 280px;
+
+        padding: 20px;
+
+        border-radius: 16px;
+
+        background: rgba(20,20,20,0.9);
+        color: white;
+
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+
+        display: none;
+    }
+
+    .background-panel.visible {
+        display: block;
+    }
+
+    .background-panel h3 {
+        margin-top: 0;
+    }
+
+    .background-panel input[type="color"] {
+        width: 100%;
+        height: 45px;
+
+        border: none;
+        padding: 0;
+
+        cursor: pointer;
+    }
+
+    .background-panel input[type="text"] {
+        width: 100%;
+
+        padding: 10px;
+
+        border-radius: 8px;
+        border: 1px solid #555;
+
+        background: #222;
+        color: white;
+
+        margin-top: 10px;
+    }
+
+    .background-panel label {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 5px;
+    }
+
+    .background-panel .small {
+        font-size: 13px;
+        color: #aaa;
+        line-height: 1.4;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="settings">
+    <button onclick="toggleBackgroundPanel()">⚙</button>
+</div>
+
+<div class="background-panel" id="backgroundPanel">
+
+    <h3>Фон</h3>
+
+    <label>Цвет</label>
+
+    <input
+        type="color"
+        id="backgroundColor"
+        value="#111111"
+        onchange="changeBackgroundColor()"
+    >
+
+    <label>URL изображения</label>
+
+    <input
+        type="text"
+        id="backgroundUrl"
+        placeholder="https://..."
+        onchange="changeBackgroundImage()"
+    >
+
+    <p class="small">
+        Можно указать прямую ссылку на изображение.
+        Настройка сохраняется в браузере.
+    </p>
+
+    <button onclick="resetBackground()">
+        Сбросить
+    </button>
+
+</div>
+
+
+<div class="timer-container">
+
+    <div class="timer" id="timer">
+        25:00
+    </div>
+
+    <div class="controls">
+
+        <button onclick="startTimer()">
+            ▶ Старт
+        </button>
+
+        <button onclick="pauseTimer()">
+            ⏸ Пауза
+        </button>
+
+        <button onclick="resetTimer()">
+            ↻ Сброс
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+     * ============================
+     * НАСТРОЙКИ ТАЙМЕРА
+     * ============================
+     */
+
+    const DEFAULT_MINUTES = 25;
+
+    let remainingSeconds = DEFAULT_MINUTES * 60;
+    let timerInterval = null;
+
+
+    /*
+     * ============================
+     * ОТОБРАЖЕНИЕ ВРЕМЕНИ
+     * ============================
+     */
+
+    function updateDisplay() {
+
+        const minutes = Math.floor(remainingSeconds / 60);
+
+        const seconds = remainingSeconds % 60;
+
+        document.getElementById("timer").textContent =
+            String(minutes).padStart(2, "0") +
+            ":" +
+            String(seconds).padStart(2, "0");
+    }
+
+
+    /*
+     * ============================
+     * СТАРТ
+     * ============================
+     */
+
+    function startTimer() {
+
+        if (timerInterval !== null) {
+            return;
+        }
+
+        timerInterval = setInterval(() => {
+
+            if (remainingSeconds > 0) {
+
+                remainingSeconds--;
+
+                updateDisplay();
+
+            } else {
+
+                pauseTimer();
+
+                // Звук окончания
+                playSound();
+
+            }
+
+        }, 1000);
+    }
+
+
+    /*
+     * ============================
+     * ПАУЗА
+     * ============================
+     */
+
+    function pauseTimer() {
+
+        clearInterval(timerInterval);
+
+        timerInterval = null;
+    }
+
+
+    /*
+     * ============================
+     * СБРОС
+     * ============================
+     */
+
+    function resetTimer() {
+
+        pauseTimer();
+
+        remainingSeconds = DEFAULT_MINUTES * 60;
+
+        updateDisplay();
+    }
+
+
+    /*
+     * ============================
+     * ЗВУК
+     * ============================
+     */
+
+    function playSound() {
+
+        const audioContext =
+            new (window.AudioContext ||
+                 window.webkitAudioContext)();
+
+        const oscillator =
+            audioContext.createOscillator();
+
+        const gain =
+            audioContext.createGain();
+
+        oscillator.frequency.value = 800;
+
+        oscillator.connect(gain);
+
+        gain.connect(audioContext.destination);
+
+        oscillator.start();
+
+        gain.gain.setValueAtTime(
+            0.3,
+            audioContext.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioContext.currentTime + 1
+        );
+
+        oscillator.stop(
+            audioContext.currentTime + 1
+        );
+    }
+
+
+    /*
+     * ============================
+     * ПАНЕЛЬ ФОНА
+     * ============================
+     */
+
+    function toggleBackgroundPanel() {
+
+        const panel =
+            document.getElementById("backgroundPanel");
+
+        panel.classList.toggle("visible");
+    }
+
+
+    /*
+     * ============================
+     * ЦВЕТ ФОНА
+     * ============================
+     */
+
+    function changeBackgroundColor() {
+
+        const color =
+            document.getElementById("backgroundColor").value;
+
+        document.body.style.backgroundColor = color;
+
+        localStorage.setItem(
+            "backgroundColor",
+            color
+        );
+    }
+
+
+    /*
+     * ============================
+     * ИЗОБРАЖЕНИЕ ФОНА
+     * ============================
+     */
+
+    function changeBackgroundImage() {
+
+        const url =
+            document.getElementById("backgroundUrl").value.trim();
+
+        if (!url) {
+            return;
+        }
+
+        document.body.style.backgroundImage =
+            `url("${url}")`;
+
+        localStorage.setItem(
+            "backgroundImage",
+            url
+        );
+    }
+
+
+    /*
+     * ============================
+     * СБРОС ФОНА
+     * ============================
+     */
+
+    function resetBackground() {
+
+        document.body.style.backgroundImage = "none";
+
+        document.body.style.backgroundColor = "#111111";
+
+        document.getElementById("backgroundColor").value =
+            "#111111";
+
+        document.getElementById("backgroundUrl").value =
+            "";
+
+        localStorage.removeItem("backgroundImage");
+
+        localStorage.setItem(
+            "backgroundColor",
+            "#111111"
+        );
+    }
+
+
+    /*
+     * ============================
+     * ЗАГРУЗКА СОХРАНЁННЫХ НАСТРОЕК
+     * ============================
+     */
+
+    function loadBackground() {
+
+        const savedColor =
+            localStorage.getItem("backgroundColor");
+
+        const savedImage =
+            localStorage.getItem("backgroundImage");
+
+
+        if (savedColor) {
+
+            document.body.style.backgroundColor =
+                savedColor;
+
+            document.getElementById("backgroundColor").value =
+                savedColor;
+        }
+
+
+        if (savedImage) {
+
+            document.body.style.backgroundImage =
+                `url("${savedImage}")`;
+
+            document.getElementById("backgroundUrl").value =
+                savedImage;
+        }
+    }
+
+
+    /*
+     * ============================
+     * ИНИЦИАЛИЗАЦИЯ
+     * ============================
+     */
+
+    updateDisplay();
+
+    loadBackground();
+
+</script>
+
+</body>
+</html>
+```
