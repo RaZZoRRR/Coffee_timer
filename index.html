@@ -2,16 +2,10 @@
 <html lang="ru">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>ДНД-ТАЙМ</title>
-
 
     <style>
 
@@ -19,14 +13,12 @@
             box-sizing: border-box;
         }
 
-
         html,
         body {
             width: 100%;
             height: 100%;
             margin: 0;
         }
-
 
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -199,10 +191,6 @@
         }
 
 
-        /* ==========================================
-           РЕЗКОЕ МИГАНИЕ
-           ========================================== */
-
         @keyframes arrowBlink {
 
             0% {
@@ -221,7 +209,7 @@
 
 
         /* ==========================================
-           ОСНОВНЫЕ КНОПКИ
+           КНОПКИ
            ========================================== */
 
         .controls {
@@ -274,11 +262,8 @@
         }
 
 
-        /* ==========================================
-           КНОПКА GIF
-           ========================================== */
-
-        .gif-button {
+        .gif-button,
+        .memes-button {
             background: rgba(255, 255, 255, 0.92);
         }
 
@@ -432,10 +417,6 @@
         }
 
 
-        /* ==========================================
-           НАЗВАНИЕ
-           ========================================== */
-
         .title-input {
             width: 100%;
 
@@ -471,10 +452,6 @@
         }
 
 
-        /* ==========================================
-           ЦВЕТ ФОНА
-           ========================================== */
-
         .settings-panel input[type="color"] {
             width: 100%;
 
@@ -487,10 +464,6 @@
             cursor: pointer;
         }
 
-
-        /* ==========================================
-           URL ФОНА
-           ========================================== */
 
         .settings-panel input[type="text"] {
             width: 100%;
@@ -788,6 +761,29 @@
 
         }
 
+
+        /* ==========================================
+           4K ТЕЛЕВИЗОР
+           ========================================== */
+
+        @media (min-width: 2500px) {
+
+            .title {
+                font-size: 120px !important;
+            }
+
+
+            .stopwatch {
+                font-size: 180px !important;
+            }
+
+
+            button {
+                font-size: 28px !important;
+            }
+
+        }
+
     </style>
 
 </head>
@@ -795,10 +791,6 @@
 
 <body>
 
-
-    <!-- ==========================================
-         ЗАТЕМНЕНИЕ ФОНА
-         ========================================== -->
 
     <div class="overlay"></div>
 
@@ -828,8 +820,6 @@
         <h2>Настройки</h2>
 
 
-        <!-- НАЗВАНИЕ -->
-
         <label for="titleInput">
             Название
         </label>
@@ -852,8 +842,6 @@
         </button>
 
 
-        <!-- СТРЕЛКА -->
-
         <div class="arrow-setting">
 
             <span>
@@ -872,8 +860,6 @@
         </div>
 
 
-        <!-- ЦВЕТ ФОНА -->
-
         <label for="backgroundColor">
             Цвет фона
         </label>
@@ -886,8 +872,6 @@
         >
 
 
-        <!-- ИЗОБРАЖЕНИЕ ФОНА -->
-
         <label for="backgroundUrl">
             URL изображения
         </label>
@@ -899,8 +883,6 @@
             placeholder="https://example.com/image.jpg"
         >
 
-
-        <!-- СБРОС ФОНА -->
 
         <button
             class="reset-background"
@@ -928,7 +910,7 @@
             class="title"
             id="title"
         >
-            ЛАНЧ-ТАЙМ
+            КОФЕ-БРЕЙК
         </div>
 
 
@@ -979,6 +961,14 @@
                 onclick="openGif()"
             >
                 🎬 GIF
+            </button>
+
+
+            <button
+                class="memes-button"
+                onclick="openMemes()"
+            >
+                😂 Мемы
             </button>
 
 
@@ -1084,10 +1074,6 @@
         let running = false;
 
 
-        /*
-         * Форматирование времени
-         */
-
         function formatTime(milliseconds) {
 
             const totalSeconds =
@@ -1123,10 +1109,6 @@
         }
 
 
-        /*
-         * Обновление секундомера
-         */
-
         function updateStopwatch() {
 
             if (!running) {
@@ -1156,10 +1138,6 @@
         }
 
 
-        /*
-         * Старт
-         */
-
         function startStopwatch() {
 
             if (running) {
@@ -1182,10 +1160,6 @@
 
         }
 
-
-        /*
-         * Пауза
-         */
 
         function pauseStopwatch() {
 
@@ -1214,10 +1188,6 @@
 
         }
 
-
-        /*
-         * Сброс
-         */
 
         function resetStopwatch() {
 
@@ -1330,7 +1300,7 @@
 
 
         /* ==========================================
-           ИЗМЕНЕНИЕ НАЗВАНИЯ
+           НАЗВАНИЕ
            ========================================== */
 
         function setTitle() {
@@ -1437,7 +1407,9 @@
            ========================================== */
 
         document
-            .getElementById("backgroundColor")
+            .getElementById(
+                "backgroundColor"
+            )
             .addEventListener(
                 "input",
                 function () {
@@ -1475,7 +1447,9 @@
            ========================================== */
 
         document
-            .getElementById("backgroundUrl")
+            .getElementById(
+                "backgroundUrl"
+            )
             .addEventListener(
                 "change",
                 function () {
@@ -1571,9 +1545,7 @@
 
 
             /*
-             * Перезагружаем GIF с новым
-             * timestamp, чтобы анимация
-             * всегда начиналась с начала.
+             * Запускаем GIF с начала
              */
 
             image.src =
@@ -1588,8 +1560,7 @@
 
 
             /*
-             * Пытаемся включить настоящий
-             * полноэкранный режим.
+             * Настоящий fullscreen
              */
 
             if (
@@ -1620,11 +1591,6 @@
             );
 
 
-            /*
-             * Выход из настоящего
-             * fullscreen режима.
-             */
-
             if (
                 document.fullscreenElement
             ) {
@@ -1640,9 +1606,23 @@
         }
 
 
-        /*
-         * ESC закрывает GIF
-         */
+        /* ==========================================
+           МЕМЫ
+           ========================================== */
+
+        function openMemes() {
+
+            window.open(
+                "https://razzorrr.github.io/photo_gallery/",
+                "_blank"
+            );
+
+        }
+
+
+        /* ==========================================
+           ESC
+           ========================================== */
 
         document.addEventListener(
             "keydown",
@@ -1669,13 +1649,14 @@
         );
 
 
-        /*
-         * Клик по затемнённому фону
-         * тоже закрывает GIF.
-         */
+        /* ==========================================
+           КЛИК ПО ФОНУ GIF
+           ========================================== */
 
         document
-            .getElementById("gifViewer")
+            .getElementById(
+                "gifViewer"
+            )
             .addEventListener(
                 "click",
                 function(event) {
@@ -1693,7 +1674,7 @@
 
 
         /* ==========================================
-           ЗАГРУЗКА СОХРАНЁННЫХ НАСТРОЕК
+           СОХРАНЁННЫЕ НАСТРОЙКИ
            ========================================== */
 
         function loadSettings() {
@@ -1729,7 +1710,7 @@
 
 
             /*
-             * Состояние стрелки
+             * Стрелка
              */
 
             const savedArrow =
@@ -1770,7 +1751,7 @@
 
 
             /*
-             * Цвет
+             * Цвет фона
              */
 
             const savedColor =
@@ -1780,7 +1761,7 @@
 
 
             /*
-             * Изображение
+             * Картинка фона
              */
 
             const savedImage =
@@ -1825,15 +1806,14 @@
         }
 
 
-        /*
-         * Запуск
-         */
+        /* ==========================================
+           ЗАПУСК
+           ========================================== */
 
         loadSettings();
 
 
     </script>
-
 
 </body>
 
