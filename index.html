@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>ДНД-ТАЙМ</title>
+
 
     <style>
 
@@ -12,12 +19,14 @@
             box-sizing: border-box;
         }
 
+
         html,
         body {
             width: 100%;
             height: 100%;
             margin: 0;
         }
+
 
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -141,10 +150,6 @@
         .arrow {
             position: absolute;
 
-            /*
-             * Начало стрелки возле правой
-             * стороны таймера
-             */
             left: calc(50% + 350px);
 
             top: 50%;
@@ -157,22 +162,11 @@
 
             transform-origin: left center;
 
-            /*
-             * Направление:
-             * вправо + вниз
-             */
             transform: rotate(35deg);
 
             box-shadow:
                 0 0 10px rgba(255, 255, 255, 0.7);
 
-            /*
-             * Полный цикл 1 секунда:
-             * 0–0.5 сек — видна
-             * 0.5–1 сек — скрыта
-             *
-             * steps() делает мигание резким.
-             */
             animation:
                 arrowBlink 1s steps(1, end) infinite;
 
@@ -181,10 +175,6 @@
             user-select: none;
         }
 
-
-        /*
-         * Наконечник стрелки
-         */
 
         .arrow::after {
             content: "";
@@ -281,6 +271,15 @@
 
         button:active {
             transform: translateY(0);
+        }
+
+
+        /* ==========================================
+           КНОПКА GIF
+           ========================================== */
+
+        .gif-button {
+            background: rgba(255, 255, 255, 0.92);
         }
 
 
@@ -573,6 +572,83 @@
 
 
         /* ==========================================
+           GIF FULLSCREEN
+           ========================================== */
+
+        .gif-viewer {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 9999;
+
+            display: none;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #000;
+        }
+
+
+        .gif-viewer.open {
+            display: flex;
+        }
+
+
+        .gif-viewer img {
+            width: 100vw;
+
+            height: 100vh;
+
+            object-fit: contain;
+
+            display: block;
+
+            user-select: none;
+
+            -webkit-user-drag: none;
+        }
+
+
+        .gif-close {
+            position: absolute;
+
+            top: 25px;
+
+            right: 30px;
+
+            z-index: 10000;
+
+            width: 65px;
+
+            height: 65px;
+
+            padding: 0;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background: rgba(255, 255, 255, 0.2);
+
+            color: white;
+
+            font-size: 40px !important;
+
+            line-height: 65px;
+
+            cursor: pointer;
+        }
+
+
+        .gif-close:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+
+        /* ==========================================
            МОБИЛЬНЫЕ УСТРОЙСТВА
            ========================================== */
 
@@ -605,10 +681,6 @@
                 letter-spacing: 2px;
             }
 
-
-            /*
-             * Стрелка на небольших экранах
-             */
 
             .arrow {
                 left: calc(50% + 145px);
@@ -699,9 +771,25 @@
                 padding: 20px;
             }
 
+
+            .gif-close {
+                top: 15px;
+
+                right: 15px;
+
+                width: 50px;
+
+                height: 50px;
+
+                line-height: 50px;
+
+                font-size: 32px !important;
+            }
+
         }
 
     </style>
+
 </head>
 
 
@@ -740,9 +828,7 @@
         <h2>Настройки</h2>
 
 
-        <!-- ======================================
-             НАЗВАНИЕ
-             ====================================== -->
+        <!-- НАЗВАНИЕ -->
 
         <label for="titleInput">
             Название
@@ -766,15 +852,14 @@
         </button>
 
 
-        <!-- ======================================
-             СТРЕЛКА
-             ====================================== -->
+        <!-- СТРЕЛКА -->
 
         <div class="arrow-setting">
 
             <span>
                 Показывать стрелку →
             </span>
+
 
             <input
                 type="checkbox"
@@ -787,9 +872,7 @@
         </div>
 
 
-        <!-- ======================================
-             ЦВЕТ ФОНА
-             ====================================== -->
+        <!-- ЦВЕТ ФОНА -->
 
         <label for="backgroundColor">
             Цвет фона
@@ -803,9 +886,7 @@
         >
 
 
-        <!-- ======================================
-             ИЗОБРАЖЕНИЕ ФОНА
-             ====================================== -->
+        <!-- ИЗОБРАЖЕНИЕ ФОНА -->
 
         <label for="backgroundUrl">
             URL изображения
@@ -819,9 +900,7 @@
         >
 
 
-        <!-- ======================================
-             СБРОС ФОНА
-             ====================================== -->
+        <!-- СБРОС ФОНА -->
 
         <button
             class="reset-background"
@@ -845,8 +924,6 @@
     <main class="container">
 
 
-        <!-- Название -->
-
         <div
             class="title"
             id="title"
@@ -854,8 +931,6 @@
             КОФЕ-БРЕЙК
         </div>
 
-
-        <!-- Таймер + диагональная стрелка -->
 
         <div class="timer-row">
 
@@ -868,11 +943,6 @@
             </div>
 
 
-            <!--
-                Пустой элемент.
-                Стрелка полностью рисуется через CSS.
-            -->
-
             <div
                 class="arrow"
                 id="arrow"
@@ -883,7 +953,7 @@
 
 
         <!-- ======================================
-             КНОПКИ СЕКУНДОМЕРА
+             КНОПКИ
              ====================================== -->
 
         <div class="controls">
@@ -901,6 +971,14 @@
 
             <button onclick="resetStopwatch()">
                 ↻ Сброс
+            </button>
+
+
+            <button
+                class="gif-button"
+                onclick="openGif()"
+            >
+                🎬 GIF
             </button>
 
 
@@ -961,13 +1039,41 @@
     </main>
 
 
+    <!-- ==========================================
+         GIF VIEWER
+         ========================================== -->
+
+    <div
+        class="gif-viewer"
+        id="gifViewer"
+    >
+
+
+        <button
+            class="gif-close"
+            onclick="closeGif()"
+            aria-label="Закрыть GIF"
+        >
+            ×
+        </button>
+
+
+        <img
+            id="gifImage"
+            src="coffee.gif"
+            alt="GIF"
+        >
+
+
+    </div>
+
+
     <script>
 
 
         /* ==========================================
            СЕКУНДОМЕР
            ========================================== */
-
 
         let startTime = null;
 
@@ -985,7 +1091,9 @@
         function formatTime(milliseconds) {
 
             const totalSeconds =
-                Math.floor(milliseconds / 1000);
+                Math.floor(
+                    milliseconds / 1000
+                );
 
 
             const hours =
@@ -1011,6 +1119,7 @@
                 ":" +
                 String(seconds).padStart(2, "0")
             );
+
         }
 
 
@@ -1043,6 +1152,7 @@
                 requestAnimationFrame(
                     updateStopwatch
                 );
+
         }
 
 
@@ -1069,6 +1179,7 @@
                 requestAnimationFrame(
                     updateStopwatch
                 );
+
         }
 
 
@@ -1100,6 +1211,7 @@
                 "stopwatch"
             ).textContent =
                 formatTime(elapsedTime);
+
         }
 
 
@@ -1141,13 +1253,13 @@
             document.getElementById(
                 "secondsInput"
             ).value = 0;
+
         }
 
 
         /* ==========================================
            РУЧНАЯ УСТАНОВКА ВРЕМЕНИ
            ========================================== */
-
 
         function setStartTime() {
 
@@ -1213,13 +1325,13 @@
                 "stopwatch"
             ).textContent =
                 formatTime(elapsedTime);
+
         }
 
 
         /* ==========================================
            ИЗМЕНЕНИЕ НАЗВАНИЯ
            ========================================== */
-
 
         function setTitle() {
 
@@ -1252,13 +1364,13 @@
                 "pageTitle",
                 title
             );
+
         }
 
 
         /* ==========================================
            СТРЕЛКА
            ========================================== */
-
 
         function toggleArrow() {
 
@@ -1295,14 +1407,15 @@
                     "showArrow",
                     "false"
                 );
+
             }
+
         }
 
 
         /* ==========================================
            НАСТРОЙКИ
            ========================================== */
-
 
         function toggleSettings() {
 
@@ -1312,14 +1425,16 @@
                 );
 
 
-            panel.classList.toggle("open");
+            panel.classList.toggle(
+                "open"
+            );
+
         }
 
 
         /* ==========================================
            ЦВЕТ ФОНА
            ========================================== */
-
 
         document
             .getElementById("backgroundColor")
@@ -1350,6 +1465,7 @@
                     localStorage.removeItem(
                         "backgroundImage"
                     );
+
                 }
             );
 
@@ -1357,7 +1473,6 @@
         /* ==========================================
            ИЗОБРАЖЕНИЕ ФОНА
            ========================================== */
-
 
         document
             .getElementById("backgroundUrl")
@@ -1383,6 +1498,7 @@
                         "backgroundImage",
                         url
                     );
+
                 }
             );
 
@@ -1390,7 +1506,6 @@
         /* ==========================================
            СБРОС ФОНА
            ========================================== */
-
 
         function resetBackground() {
 
@@ -1429,13 +1544,157 @@
                 "backgroundColor",
                 "#171717"
             );
+
         }
+
+
+        /* ==========================================
+           GIF
+           ========================================== */
+
+        const GIF_FILE =
+            "coffee.gif";
+
+
+        function openGif() {
+
+            const viewer =
+                document.getElementById(
+                    "gifViewer"
+                );
+
+
+            const image =
+                document.getElementById(
+                    "gifImage"
+                );
+
+
+            /*
+             * Перезагружаем GIF с новым
+             * timestamp, чтобы анимация
+             * всегда начиналась с начала.
+             */
+
+            image.src =
+                GIF_FILE +
+                "?t=" +
+                Date.now();
+
+
+            viewer.classList.add(
+                "open"
+            );
+
+
+            /*
+             * Пытаемся включить настоящий
+             * полноэкранный режим.
+             */
+
+            if (
+                viewer.requestFullscreen
+            ) {
+
+                viewer
+                    .requestFullscreen()
+                    .catch(
+                        () => {}
+                    );
+
+            }
+
+        }
+
+
+        function closeGif() {
+
+            const viewer =
+                document.getElementById(
+                    "gifViewer"
+                );
+
+
+            viewer.classList.remove(
+                "open"
+            );
+
+
+            /*
+             * Выход из настоящего
+             * fullscreen режима.
+             */
+
+            if (
+                document.fullscreenElement
+            ) {
+
+                document
+                    .exitFullscreen()
+                    .catch(
+                        () => {}
+                    );
+
+            }
+
+        }
+
+
+        /*
+         * ESC закрывает GIF
+         */
+
+        document.addEventListener(
+            "keydown",
+            function(event) {
+
+                const viewer =
+                    document.getElementById(
+                        "gifViewer"
+                    );
+
+
+                if (
+                    event.key === "Escape" &&
+                    viewer.classList.contains(
+                        "open"
+                    )
+                ) {
+
+                    closeGif();
+
+                }
+
+            }
+        );
+
+
+        /*
+         * Клик по затемнённому фону
+         * тоже закрывает GIF.
+         */
+
+        document
+            .getElementById("gifViewer")
+            .addEventListener(
+                "click",
+                function(event) {
+
+                    if (
+                        event.target === this
+                    ) {
+
+                        closeGif();
+
+                    }
+
+                }
+            );
 
 
         /* ==========================================
            ЗАГРУЗКА СОХРАНЁННЫХ НАСТРОЕК
            ========================================== */
-
 
         function loadSettings() {
 
@@ -1465,6 +1724,7 @@
 
                 document.title =
                     savedTitle;
+
             }
 
 
@@ -1478,7 +1738,9 @@
                 );
 
 
-            if (savedArrow === "false") {
+            if (
+                savedArrow === "false"
+            ) {
 
                 document.getElementById(
                     "arrow"
@@ -1503,6 +1765,7 @@
                     "arrowCheckbox"
                 ).checked =
                     true;
+
             }
 
 
@@ -1539,6 +1802,7 @@
                     )
                     .value =
                     savedColor;
+
             }
 
 
@@ -1555,7 +1819,9 @@
                     )
                     .value =
                     savedImage;
+
             }
+
         }
 
 
@@ -1568,5 +1834,7 @@
 
     </script>
 
+
 </body>
+
 </html>
