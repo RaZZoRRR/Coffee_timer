@@ -334,6 +334,19 @@
 
 
         /* ==========================================
+           КНОПКА НАСТРОЙКИ НАДПИСИ
+           ========================================== */
+
+        .time-setting .title-setting-button {
+            margin-left: 12px;
+
+            padding: 13px 22px;
+
+            font-size: 18px !important;
+        }
+
+
+        /* ==========================================
            КНОПКА НАСТРОЕК
            ========================================== */
 
@@ -719,6 +732,15 @@
             }
 
 
+            .time-setting .title-setting-button {
+                margin-left: 5px;
+
+                padding: 10px 14px;
+
+                font-size: 14px !important;
+            }
+
+
             .settings-button {
                 top: 15px;
 
@@ -1020,6 +1042,14 @@
 
             <button onclick="setStartTime()">
                 Установить
+            </button>
+
+
+            <button
+                class="title-setting-button"
+                onclick="openTitleSettings()"
+            >
+                Настроить надпись
             </button>
 
 
@@ -1334,6 +1364,28 @@
                 "pageTitle",
                 title
             );
+
+        }
+
+
+        /* ==========================================
+           ОТКРЫТИЕ НАСТРОЕК НАДПИСИ
+           ========================================== */
+
+        function openTitleSettings() {
+
+            const panel =
+                document.getElementById(
+                    "settingsPanel"
+                );
+
+
+            panel.classList.add("open");
+
+
+            document
+                .getElementById("titleInput")
+                .focus();
 
         }
 
